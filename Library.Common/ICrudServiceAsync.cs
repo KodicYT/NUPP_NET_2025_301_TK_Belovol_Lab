@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Library.Common
 {
-    public interface ICrudServiceAsync<T>
+    public interface ICrudServiceAsync<T> where T : class
     {
         Task<bool> CreateAsync(T element);
         Task<T?> ReadAsync(Guid id);

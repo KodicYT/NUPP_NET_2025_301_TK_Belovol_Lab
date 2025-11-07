@@ -2,19 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Library.Infrastructure;
 
 namespace Library.Common
 {
-    public class LibraryServiceAsync<T>
+    public class LibraryServiceAsync<T> : ICrudServiceAsync<T> where T : class
     {
-        private readonly List<T> _items = new List<T>();
+        private readonly IRepository<T> _repository;
+
+        public LibraryServiceAsync(IRepository<T> repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<bool> CreateAsync(T element)
         {
             try
             {
-                _items.Add(element);
-                await Task.Delay(1);
+                await _repository.AddAsync(element);
                 return true;
             }
             catch
@@ -25,28 +30,25 @@ namespace Library.Common
 
         public async Task<T?> ReadAsync(Guid id)
         {
-            await Task.Delay(1);
-            // Для тестування повертаємо перший елемент
-            return _items.Count > 0 ? _items[0] : default(T);
+            return await _repository.GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<T>> ReadAllAsync()
         {
-            await Task.Delay(1);
-            return _items;
+            return await _repository.GetAllAsync();
         }
 
         public async Task<IEnumerable<T>> ReadAllAsync(int page, int amount)
         {
-            await Task.Delay(1);
-            return _items.Skip((page - 1) * amount).Take(amount);
+            var allItems = await _repository.GetAllAsync();
+            return allItems.Skip((page - 1) * amount).Take(amount);
         }
 
         public async Task<bool> UpdateAsync(T element)
         {
             try
             {
-                await Task.Delay(1);
+                await _repository.UpdateAsync(element);
                 return true;
             }
             catch
@@ -59,8 +61,7 @@ namespace Library.Common
         {
             try
             {
-                _items.Remove(element);
-                await Task.Delay(1);
+                await _repository.DeleteAsync(element);
                 return true;
             }
             catch
@@ -73,7 +74,7 @@ namespace Library.Common
         {
             try
             {
-                await Task.Delay(1);
+                await _repository.SaveAsync();
                 return true;
             }
             catch

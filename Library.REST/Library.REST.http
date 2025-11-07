@@ -1,0 +1,6 @@
+@Library.REST_HostAddress = http://localhost:5012
+
+GET {{Library.REST_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

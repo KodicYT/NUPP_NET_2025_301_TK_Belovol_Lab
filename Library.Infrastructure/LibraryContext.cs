@@ -5,6 +5,10 @@ namespace Library.Infrastructure
 {
     public class LibraryContext : DbContext
     {
+        public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
+        {
+        }
+
         public DbSet<BookModel> Books { get; set; }
         public DbSet<EBookModel> EBooks { get; set; }
         public DbSet<JournalModel> Journals { get; set; }
@@ -13,7 +17,10 @@ namespace Library.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=library.db");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite("Data Source=library.db");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
