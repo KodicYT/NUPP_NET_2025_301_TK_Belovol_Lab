@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Library.Common;
 using Library.Infrastructure.Models;
 using Library.REST.Models;
@@ -16,8 +17,9 @@ namespace Library.REST.Controllers
             _bookService = bookService;
         }
 
-        // GET: api/books
+        // GET: api/books - Public access
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {
             var books = await _bookService.ReadAllAsync();
@@ -32,8 +34,9 @@ namespace Library.REST.Controllers
             return Ok(bookDtos);
         }
 
-        // GET: api/books/{id}
+        // GET: api/books/{id} - Public access
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<BookDto>> GetBook(Guid id)
         {
             var book = await _bookService.ReadAsync(id);
@@ -53,8 +56,9 @@ namespace Library.REST.Controllers
             return Ok(bookDto);
         }
 
-        // POST: api/books
+        // POST: api/books - Only Librarian and Admin
         [HttpPost]
+        [Authorize(Policy = "RequireLibrarianRole")]
         public async Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto)
         {
             var book = new BookModel
@@ -84,8 +88,9 @@ namespace Library.REST.Controllers
             return BadRequest();
         }
 
-        // PUT: api/books/{id}
+        // PUT: api/books/{id} - Only Librarian and Admin
         [HttpPut("{id}")]
+        [Authorize(Policy = "RequireLibrarianRole")]
         public async Task<IActionResult> UpdateBook(Guid id, CreateBookDto updateBookDto)
         {
             var existingBook = await _bookService.ReadAsync(id);
@@ -109,8 +114,9 @@ namespace Library.REST.Controllers
             return BadRequest();
         }
 
-        // DELETE: api/books/{id}
+        // DELETE: api/books/{id} - Only Admin
         [HttpDelete("{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             var book = await _bookService.ReadAsync(id);
